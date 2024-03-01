@@ -26,34 +26,33 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 
 1. Updating the *existing* Schedule called `UK National Holidays, use the following:
 ```powershell
-#Commands
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 .\Update-TeamsPublicHolidays.ps1
 Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
-#Output
-UPDATING: UK National Holidays
-CURRENT SCHEDULE:
-
-Start               End                
------               ---                
-01/01/2024 00:00:00 02/01/2024 00:00:00
+```
+![UK 2024 Example](/Examples/UK_2024.png")
 
 
-NEW SCHEDULE:
+2. Updating the *existing* Schedule called `DE National Holidays, use the following:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\Update-TeamsPublicHolidays.ps1
+Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
+```
+![DE 2024 Example](.\Examples\DE_2024.png")
 
-Start               End                
------               ---                
-01/01/2024 00:00:00 02/01/2024 00:00:00
-02/01/2024 00:00:00 03/01/2024 00:00:00
-17/03/2024 00:00:00 18/03/2024 00:00:00
-29/03/2024 00:00:00 30/03/2024 00:00:00
-01/04/2024 00:00:00 02/04/2024 00:00:00
-06/05/2024 00:00:00 07/05/2024 00:00:00
-27/05/2024 00:00:00 28/05/2024 00:00:00
-12/07/2024 00:00:00 13/07/2024 00:00:00
-05/08/2024 00:00:00 06/08/2024 00:00:00
-26/08/2024 00:00:00 27/08/2024 00:00:00
-30/11/2024 00:00:00 01/12/2024 00:00:00
-25/12/2024 00:00:00 26/12/2024 00:00:00
-26/12/2024 00:00:00 27/12/2024 00:00:00
+
+## Don't have an *existing* Schedule
+Maybe create one... here you go:
+```poweshell
+$scheduleName="UK National Holidays"    ### UPDATE THIS SPELLING
+Import-Module MicrosoftTeams
+Connect-MicrosoftTeams
+$today = Get-Date -Format "yyyy-MM-dd";
+$dateStart="$today 00:00"; $dateEnd="$today 23:59";
+$schedule = New-CsOnlineSchedule -Name $scheduleName
+$schedule.FixedSchedule.DateTimeRanges = @()
+$schedule.FixedSchedule.DateTimeRanges += New-CsOnlineDateTimeRange -Start $dateStart -End $dateEnd
+Set-CsOnlineSchedule -Instance $schedule
+Write-Host "You can now use the .\Update-TeamsPublicHolidays.ps1 file to update your new schedule ($ScheduleName)"
 ```
