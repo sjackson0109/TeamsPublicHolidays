@@ -24,7 +24,7 @@
 
 .LINK
     https://github.com/sjackson0109/TeamsScheduleNationalHolidays
-
+    https://blog.jacksonfamily.me/Teams-ScheduleNationalHolidays
 #>
 
 function Get-PublicHolidays {
