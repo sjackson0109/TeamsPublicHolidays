@@ -22,27 +22,27 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 3. **Update Parameters**: Modify the parameters in the script as needed, including the schedule name and country code.
 4. **Execute the Script**: Run the `Update-PublicHolidays` function with the desired parameters to update the schedule.
 
-## Examples
+### Examples
 
 1. Updating the *existing* Schedule called `UK National Holidays, use the following:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-.\Update-TeamsPublicHolidays.ps1
-Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
-```
-![UK 2024 Example](/Examples/UK_2024.png)
+- ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+  .\Update-TeamsPublicHolidays.ps1
+  Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
+  ```
+- ![UK 2024 Example](/Examples/UK_2024.png)
 
 
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-.\Update-TeamsPublicHolidays.ps1
-Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
-```
-![DE 2024 Example](/Examples/DE_2024.png)
+- ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+  .\Update-TeamsPublicHolidays.ps1
+  Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
+  ```
+- ![DE 2024 Example](/Examples/DE_2024.png)
 
 
-## Don't have an *existing* Schedule
+## Are you forgetting the *existing* Schedule?
 Maybe create one... here you go:
 ```poweshell
 $scheduleName="UK National Holidays"    ### UPDATE THIS SPELLING
