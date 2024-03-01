@@ -39,7 +39,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 .\Update-TeamsPublicHolidays.ps1
 Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
 ```
-![DE 2024 Example](.\Examples\DE_2024.png)
+![DE 2024 Example](/Examples/DE_2024.png)
 
 
 ## Don't have an *existing* Schedule
