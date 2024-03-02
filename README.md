@@ -27,17 +27,14 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 1. Updating the *existing* Schedule called `UK National Holidays, use the following:
 - ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-  .\Update-TeamsPublicHolidays.ps1
-  Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode "GB"
+  Import-Module .\TeamsPublicHolidays.ps1
+  Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
   ```
-- 
-- 
-
 
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
 - ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-  .\Update-TeamsPublicHolidays.ps1
+  Import-Module .\TeamsPublicHolidays.ps1
   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE'
   ```
 
@@ -45,6 +42,10 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 |---|---|
 |![UK 2024 Command](/Examples/UK_2024.png)|![UK 2024 Result](/Examples/UK_2024_Result.png)|
 |![DE 2024 Command](/Examples/DE_2024.png)|![DE 2024 Result](/Examples/DE_2024_Result.png)|
+
+
+## Where do the country codes come from?
+You can look up your country code (2-digits) from [here](https://www.iban.com/country-codes).
 
 
 ## Are you forgetting the *existing* Schedule?
@@ -65,18 +66,12 @@ Write-Host "You can now use the .\Update-TeamsPublicHolidays.ps1 file to update 
 
 ## Conflicting Schedules?
 Having experienced this issue myself, i figured i'd explain it.
-
-I had 'UK National Holidays' and 'Company Closures' schedules attached. Our company is closed for 3-days during the christmas period, and I figured i'd add them in manually.  I slipped a day, and boxing day overlapped with the 'UK National Holidays' for 2024.
-
-Pretty simple fix: ensure both schedules don't conflict. nice and easy.
-
 ```powershell
 Correlation id for this request : 41825f04-a34b-4513-a905-43945ae17645
 Microsoft.Teams.ConfigAPI.Cmdlets.internal\Set-CsOnlineSchedule : The changes made in Schedule 83e774b4-eabf-478f-914e-56966515a9b3 are causing conflicts with other schedules in Auto Attendant 70561269-5dc8-485c-b125-5a75ab90ebed. Error: Holidays within an auto
 attendant cannot start at the same date-time.
-At C:\Program Files\WindowsPowerShell\Modules\MicrosoftTeams\6.0.0\custom\Merged_custom_PsExt.ps1:9790 char:13
-+             $result = Microsoft.Teams.ConfigAPI.Cmdlets.internal\Set- ...
-+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : InvalidOperation: ({ Identity = 83...dels.Schedule }:<>f__AnonymousType77`2) [Set-CsOnlineSchedule_SetExpanded], Exception
-    + FullyQualifiedErrorId : 100002,Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Cmdlets.SetCsOnlineSchedule_SetExpanded
 ```
+Root-cause is relatively simple: I had 'UK National Holidays' and 'Company Closures' schedules  to a single auto-attendant. Our company is closed for 3-days during the christmas period, and I figured i'd add them in manually.  I slipped a day, and boxing day overlapped with the 'UK National Holidays' for 2024.
+
+Pretty simple fix: ensure both schedules don't conflict. nice and easy.
+
