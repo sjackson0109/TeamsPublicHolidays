@@ -20,7 +20,7 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 1. **Requirements**: Ensure that you have the required PowerShell modules installed, including the Microsoft Teams module.
 2. **Import the Script**: Import the PowerShell script into your environment.
 3. **Update Parameters**: Modify the parameters in the script as needed, including the schedule name and country code.
-4. **Execute the Script**: Run the `Update-PublicHolidays` function with the desired parameters to update the schedule.
+4. **Execute the Script**: Run the `Update-TeamsPublicHolidays` function with the desired parameters to update the schedule.
 
 ### Examples
 
@@ -28,18 +28,23 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 - ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   .\Update-TeamsPublicHolidays.ps1
-  Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
+  Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode "GB"
   ```
-- ![UK 2024 Example](/Examples/UK_2024.png)
+- 
+- 
 
 
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
 - ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   .\Update-TeamsPublicHolidays.ps1
-  Update-PublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
+  Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE'
   ```
-- ![DE 2024 Example](/Examples/DE_2024.png)
+
+|Command|Result|
+|---|---|
+|![UK 2024 Command](/Examples/UK_2024.png)|![UK 2024 Result](/Examples/UK_2024_Result.png)|
+|![DE 2024 Command](/Examples/DE_2024.png)|![DE 2024 Result](/Examples/DE_2024_Result.png)|
 
 
 ## Are you forgetting the *existing* Schedule?
@@ -55,4 +60,23 @@ $schedule.FixedSchedule.DateTimeRanges = @()
 $schedule.FixedSchedule.DateTimeRanges += New-CsOnlineDateTimeRange -Start $dateStart -End $dateEnd
 Set-CsOnlineSchedule -Instance $schedule
 Write-Host "You can now use the .\Update-TeamsPublicHolidays.ps1 file to update your new schedule ($ScheduleName)"
+```
+
+
+## Conflicting Schedules?
+Having experienced this issue myself, i figured i'd explain it.
+
+I had 'UK National Holidays' and 'Company Closures' schedules attached. Our company is closed for 3-days during the christmas period, and I figured i'd add them in manually.  I slipped a day, and boxing day overlapped with the 'UK National Holidays' for 2024.
+
+Pretty simple fix: ensure both schedules don't conflict. nice and easy.
+
+```powershell
+Correlation id for this request : 41825f04-a34b-4513-a905-43945ae17645
+Microsoft.Teams.ConfigAPI.Cmdlets.internal\Set-CsOnlineSchedule : The changes made in Schedule 83e774b4-eabf-478f-914e-56966515a9b3 are causing conflicts with other schedules in Auto Attendant 70561269-5dc8-485c-b125-5a75ab90ebed. Error: Holidays within an auto
+attendant cannot start at the same date-time.
+At C:\Program Files\WindowsPowerShell\Modules\MicrosoftTeams\6.0.0\custom\Merged_custom_PsExt.ps1:9790 char:13
++             $result = Microsoft.Teams.ConfigAPI.Cmdlets.internal\Set- ...
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: ({ Identity = 83...dels.Schedule }:<>f__AnonymousType77`2) [Set-CsOnlineSchedule_SetExpanded], Exception
+    + FullyQualifiedErrorId : 100002,Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Cmdlets.SetCsOnlineSchedule_SetExpanded
 ```

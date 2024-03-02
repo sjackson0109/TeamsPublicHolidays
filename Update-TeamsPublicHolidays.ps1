@@ -29,7 +29,7 @@
 
 function Get-PublicHolidays {
     Param(
-        [string]$CountryCode= "UK"
+        [string]$CountryCode= "GB"
     )
     $year = Get-Date -Format yyyy
     $url = "https://date.nager.at/api/v3/PublicHolidays/$year/$CountryCode"
@@ -37,15 +37,14 @@ function Get-PublicHolidays {
     $holidays = $holidaysResponse | ForEach-Object {
         [PSCustomObject]@{
             Date = $_.date
-            LocalName = $_.localName
             Name = $_.name
         }
     }
     return $holidays
 }
-function Update-PublicHolidays {
+function Update-TeamsPublicHolidays {
     Param(
-        [string]$CountryCode= "UK",
+        [string]$CountryCode= "GB",
         [string]$ScheduleName= "UK National Holidays"
     )
     $holidays = Get-PublicHolidays -CountryCode $CountryCode
