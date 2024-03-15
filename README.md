@@ -52,7 +52,7 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 - ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   Import-Module .\TeamsPublicHolidays.ps1
-  Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Year 2024
+  Create-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Year 2024
   ```
 
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
@@ -60,6 +60,12 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   Import-Module .\TeamsPublicHolidays.ps1
   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024 -Append
+  ```
+3. Replace the *existing* Schedule called `DE National Holidays, use the following:
+- ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+  Import-Module .\TeamsPublicHolidays.ps1
+  Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024
   ```
 
 |Command|Result|
@@ -71,12 +77,9 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 ## Where do the country codes come from?
 You can look up your country code (2-digits) from [here](https://www.iban.com/country-codes).
 
-## Still have conflicting schedules?
-Having experienced this issue myself, i figured i'd explain it.
-```powershell
-Correlation id for this request : 41825f04-a34b-4513-a905-43945ae17645
-Microsoft.Teams.ConfigAPI.Cmdlets.internal\Set-CsOnlineSchedule : The changes made in Schedule 83e774b4-eabf-478f-914e-56966515a9b3 are causing conflicts with other schedules in Auto Attendant 70561269-5dc8-485c-b125-5a75ab90ebed. Error: Holidays within an auto
-attendant cannot start at the same date-time.
-```
-**Explaination** We had `UK National Holidays` and `Company Closures` schedules attached to a single auto-attendant. I slipped a date when creating the `Company Closures` implying that both a national holiday and a company closure date overlapped. That isn't possible for the Microsoft Teams Call-Flow to logically process. Imagine the National Holidays action sending to voicemail, and the Company Closures forwarding to a mobile.. Which one would MS Teams Auto-Attendant use? Microsoft's API clealy checks for this scenario, hence the above error message. 
-Solution: Ensure both schedules don't have any overlapping/conflicting dates.
+## Support or Warranty
+These scripts are built by me, for me and customers i've supported. 
+If you want to use them, you are free to do so. But there is no warranty or support offered as part of this free code.
+
+## Issues and Feedback
+If you encounter any issues or have feedback to improve these scripts, please log them in the GitHub Issues or Discussions section of this repository. Your input is valuable and helps in enhancing the usability and reliability of the scripts for the community.
