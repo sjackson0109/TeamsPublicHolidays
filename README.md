@@ -49,20 +49,20 @@ Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` 
 ### Examples
 
 1. Create a *new* Schedule called `UK National Holidays`, for the year `2024`, using the following:
-- ```powershell
+  ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   Import-Module .\TeamsPublicHolidays.ps1
   Create-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Year 2024
   ```
 
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
-- ```powershell
+  ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   Import-Module .\TeamsPublicHolidays.ps1
   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024 -Append
   ```
 3. Replace the *existing* Schedule called `DE National Holidays, use the following:
-- ```powershell
+  ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
   Import-Module .\TeamsPublicHolidays.ps1
   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024
