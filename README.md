@@ -4,9 +4,9 @@ This PowerShell script automates the management of public holidays in Microsoft 
 
 ##
 
-Author: Simon Jackson (@sjackson0109)
-Date: 10/02/2024
-Special Thanks: Bjoren Dassow (@dassbj01) for a hint to use the `date.nager.at` REST api service. 
+- Author: Simon Jackson (@sjackson0109)
+- Date: 10/02/2024
+- Thanks: Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` REST api service
 
 
 ## Features
