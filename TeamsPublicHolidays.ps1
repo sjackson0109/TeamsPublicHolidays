@@ -90,7 +90,7 @@ function Create-TeamsPublicHolidays {
     }
 
     # Remove the initial date time range from the fixed schedule's date time ranges
-    $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_ -ne $initialDateTimeRange }
+    $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.start -ne $initialDateTimeRange.start }
 
     # Output the dates added to the schedule
     Write-Host "Dates added to schedule '$ScheduleName':"
@@ -164,7 +164,7 @@ function Update-TeamsPublicHolidays {
         }
 
         # Remove the initial date time range from the fixed schedule's date time ranges
-        $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_ -ne $initialDateTimeRange }
+        $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.start -ne $initialDateTimeRange.start }
 
         # Output the dates added to the schedule
         Write-Host "Dates added to schedule '$ScheduleName':"
