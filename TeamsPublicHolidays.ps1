@@ -7,29 +7,22 @@
 
 .EXAMPLE
     Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB'
-<<<<<<< HEAD
     #This command updates the 'UK National Holidays' schedule in Microsoft Teams with the public holidays for the United Kingdom. Default behaviour is append, but can be overuled with the "-NotAppend" switch. 
-=======
-    #This command updates the 'UK National Holidays' schedule in Microsoft Teams with the public holidays for the United Kingdom. Default behaviour is append, but can be overuled with the "-Not Append" switch. 
->>>>>>> 7360d253a4e2c067d4177931a5fb6e50a538869d
-	It will only add the future holidays, all past holidays will not be added. 
+    It will only add the future holidays, all past holidays will not be added. 
 
     Create-TeamsPublicHolidays -ScheduleName 'FR National Holidays' -CountryCode 'FR'
     # This command creates a new schedule named 'FR National Holidays' in Microsoft Teams and attaches the public holidays for France. 
-	It will only add the future holidays, all past holidays will not be added. 
-<<<<<<< HEAD
-	
-	Create-TeamsPublicHolidays -ScheduleName 'DE Regional Bavaria Holidays' -CountryCode 'DE' -Region 'BY'
+    It will only add the future holidays, all past holidays will not be added. 
+    
+    Create-TeamsPublicHolidays -ScheduleName 'DE Regional Bavaria Holidays' -CountryCode 'DE' -Region BY
     # This command creates a new schedule named 'DE Regional Bavaria Holidays' in Microsoft Teams and attaches the National public holidays for Germany including the Regional holidays for the Region (Bavaria). 
-	It will only add the future holidays, all past holidays will not be added. 
-=======
->>>>>>> 7360d253a4e2c067d4177931a5fb6e50a538869d
+    It will only add the future holidays, all past holidays will not be added. 
 
 
 .NOTES
     File Name      	: Update-TeamsPublicHolidays.ps1
     Author         	: Simon Jackson (@sjackson0109)
-	Updated by		: Mitchell Bakker (mitchelljb)
+    Updated by		: Mitchell Bakker (mitchelljb)
     Prerequisite   	: PowerShell 3.0 or above, Microsoft Teams module installed
     Last Modified  	: 2024/06/03
 
