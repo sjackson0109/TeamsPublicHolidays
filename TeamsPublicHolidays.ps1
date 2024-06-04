@@ -102,7 +102,6 @@ function Create-TeamsPublicHolidays {
         $schedule.FixedSchedule.DateTimeRanges += New-CsOnlineDateTimeRange -Start $DateStart -End $DateEnd
     }
 
-    # Remove the initial date time range from the fixed schedule's date time ranges
 	# Remove all hisatorical events
     $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.end -ge (Get-date) }
 
@@ -181,7 +180,8 @@ function Update-TeamsPublicHolidays {
         }
 
         # Remove the initial date time range from the fixed schedule's date time ranges
-		$schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.end -ge (Get-date) }
+        $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.end -ge (Get-date) }
+
         # Output the dates added to the schedule
         Write-Host "Dates added to schedule '$ScheduleName':"
         $schedule.FixedSchedule.DateTimeRanges | Format-Table -Property Start, End -AutoSize
