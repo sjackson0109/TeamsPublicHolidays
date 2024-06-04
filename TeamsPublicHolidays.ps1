@@ -33,7 +33,7 @@
 function Get-PublicHolidays {
     Param(
         [string]$CountryCode = "NL",
-		[string]$Region = "",
+	[string]$Region = "",
         [string]$Year = (Get-Date).Year
     )
     
@@ -74,13 +74,14 @@ function Get-PublicHolidays {
 function Create-TeamsPublicHolidays {
     Param(
         [string]$CountryCode = "GB",
+	[string]$Region = "",
         [string]$ScheduleName = "UK National Holidays",
         [int]$Year = (Get-Date).Year
     )
 
     try {
         # Get public holidays for the specified country code and year
-        $holidays = Get-PublicHolidays -CountryCode $CountryCode -Year $Year
+        $holidays = Get-PublicHolidays -CountryCode $CountryCode -Year $Year -Region $Region
     } catch {
         Write-Error "An error occurred while fetching holidays for country code ($CountryCode) and year ($Year)"
         Write-Host "TIP: Check you have supplied the correct CountryCode from the following website: https://www.iban.com/country-codes"
@@ -117,6 +118,7 @@ function Create-TeamsPublicHolidays {
 function Update-TeamsPublicHolidays {
     Param(
         [string]$CountryCode = "GB",
+	[string]$Region = "",
         [string]$ScheduleName = "UK National Holidays",
         [int]$Year = (Get-Date).Year,
         [switch]$NotAppend=$false
@@ -124,7 +126,7 @@ function Update-TeamsPublicHolidays {
     
     try {
         # Get public holidays for the specified country code and year
-        $holidays = Get-PublicHolidays -CountryCode $CountryCode -Year $Year
+        $holidays = Get-PublicHolidays -CountryCode $CountryCode -Year $Year -Region $Region
     } catch {
         Write-Error "An error occurred while fetching holidays for country code ($CountryCode) and year ($Year)"
         Write-Host "TIP: Check you have supplied the correct CountryCode from the following website: https://www.iban.com/country-codes"
