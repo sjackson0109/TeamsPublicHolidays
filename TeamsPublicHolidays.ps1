@@ -10,11 +10,11 @@
     #This command updates the 'UK National Holidays' schedule in Microsoft Teams with the public holidays for the United Kingdom. Default behaviour is append, but can be overuled with the "-NotAppend" switch. 
     It will only add the future holidays, all past holidays will not be added. 
 
-    Create-TeamsPublicHolidays -ScheduleName 'FR National Holidays' -CountryCode 'FR'
+    New-TeamsPublicHolidays -ScheduleName 'FR National Holidays' -CountryCode 'FR'
     # This command creates a new schedule named 'FR National Holidays' in Microsoft Teams and attaches the public holidays for France. 
     It will only add the future holidays, all past holidays will not be added. 
     
-    Create-TeamsPublicHolidays -ScheduleName 'DE Regional Bavaria Holidays' -CountryCode 'DE' -Region BY
+    New-TeamsPublicHolidays -ScheduleName 'DE Regional Bavaria Holidays' -CountryCode 'DE' -Region BY
     # This command creates a new schedule named 'DE Regional Bavaria Holidays' in Microsoft Teams and attaches the National public holidays for Germany including the Regional holidays for the Region (Bavaria). 
     It will only add the future holidays, all past holidays will not be added. 
 
@@ -97,7 +97,7 @@ function Get-PublicHolidays {
     # Output the final list of holidays
     Return $cleansedHolidays
 }
-function Create-TeamsPublicHolidays {
+function New-TeamsPublicHolidays {
     Param(
         [string]$CountryCode = "GB",
         [string]$Region = "",

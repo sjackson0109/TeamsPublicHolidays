@@ -43,7 +43,7 @@ This PowerShell script automates the management of public holidays in Microsoft 
     ```
     Note: One-day we will look to sign the ps1 file so the Set-ExecutionPolicy command can be skipped.
 
-4. **Execute the Script**: Run the `Create-TeamsPublicHolidays` or `Update-TeamsPublicHolidays` function(s) with the desired parameters to create/update the appropriate parameters; from this list:
+4. **Execute the Script**: Run the `New-TeamsPublicHolidays` or `Update-TeamsPublicHolidays` function(s) with the desired parameters to create/update the appropriate parameters; from this list:
     - ScheduleName: Specifies the name of the Microsoft Teams schedule to be updated or created.
     - CountryCode: Specifies the country code for which public holidays should be fetched. Use the country code list to find the appropriate code.
     - Year: (Optional) Specifies the year for which public holidays should be fetched. If not provided, the current year is used by default.
@@ -53,7 +53,7 @@ This PowerShell script automates the management of public holidays in Microsoft 
 
 1. Create a *new* Schedule called `UK National Holidays`, specific to `England only`, for the year `2024`, using the following:
    ```powershell
-   Create-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Region 'ENG'
+   New-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Region 'ENG'
    ```
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
    ```powershell
@@ -114,6 +114,7 @@ Date       Name                   Global CountryCode Counties
 All items where Global=True should be included, for each Region underneath. Some holidays are region specific. EG UK Easter Monday covers England (ENG), Wales (WLS) and Northern-Ireland (NIR). Try adding a filter to check it works first:
 ```powershell
 Get-PublicHolidays -CountryCode GB -Region ENG | ft
+
 Fetching holidays from URL: https://date.nager.at/api/v3/PublicHolidays/2024/GB
  - dates retrieved: 15
  - dates including global indicator: 15
