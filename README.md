@@ -57,11 +57,11 @@ This PowerShell script automates the management of public holidays in Microsoft 
    ```
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
    ```powershell
-   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2026'
+   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2024'
    ```
-3. Replace the *existing* Schedule called `DE National Holidays, use the following:
+3. Replace the *existing* Schedule called `Berlin Holidays, use the following:
    ```powershell
-   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2025'
+   Update-TeamsPublicHolidays -ScheduleName 'Berlin Holidays' -CountryCode 'DE' -Region 'BE'
    ```
 4. Update the *existing* Schedule called `Polish National Holidays`, `for 2025` use the following:
    ```powershell
