@@ -177,7 +177,7 @@ function Update-TeamsPublicHolidays {
 
     # Retrieve existing schedule
     $existingSchedule = Get-CsOnlineSchedule | Where-Object { $_.Name -eq "$ScheduleName" }
-    if ($existingSchedule -eq $null) {
+    if ($null -eq $existingSchedule) {
         Write-Error "No existing schedule found with name '$ScheduleName'"
         return
     }
@@ -242,7 +242,7 @@ function Prune-TeamsPublicHolidays {
 
     # Retrieve existing schedule
     $existingSchedule = Get-CsOnlineSchedule | Where-Object { $_.Name -eq "$ScheduleName" }
-    if ($existingSchedule -eq $null) {
+    if ($null -eq $existingSchedule) {
         Write-Error "No existing schedule found with name '$ScheduleName'"
         return
     }
