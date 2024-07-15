@@ -30,51 +30,77 @@
     https://github.com/sjackson0109/TeamsScheduleNationalHolidays
     https://blog.jacksonfamily.me/Teams-ScheduleNationalHolidays
 #>
+
 function Get-PublicHolidays {
     Param(
-        [string]$CountryCode = "NL",
-	[string]$Region = "",
-        [string]$Year = (Get-Date).Year
+        [string]$CountryCode = "GB",
+        [string]$Region = "",
+        [int]$Year = (Get-Date).Year
     )
-    
+
     $url = "https://date.nager.at/api/v3/PublicHolidays/$Year/$CountryCode"
-    Write-Debug "Fetching holidays from URL: $url"
+    Write-Host "Fetching holidays from URL: $url"
 
     try {
         $holidaysResponse = Invoke-RestMethod -Uri $url -Method "GET"
     } catch {
-        Write-Error "An error occurred while fetching holidays for country code ($CountryCode) and year ($year)"
+        Write-Error "An error occurred while fetching holidays for country code ($CountryCode) and year ($Year)"
         Write-Host "TIP: Check you have supplied the correct CountryCode from the following website: https://www.iban.com/country-codes"
         return @()
     }
-    
-    Write-Debug "Number of unique holidays provided: $($holidaysResponse.Count)"
 
-    # Deduplicate holidays by date
-    $uniqueHolidays = $holidaysResponse | Select-Object -Unique Date, Name, Global, Counties
-    
-    Write-Debug "Number of unique holidays filtered: $($uniqueHolidays.Count)"
+    Write-Host " - dates retrieved: $($holidaysResponse.Count)"
 
-    #Filter only the columns necessary
-    $holidays = $uniqueHolidays | ForEach-Object {
+    # Ensure global holidays are included and format the holidays
+    $holidays = $holidaysResponse | ForEach-Object {
         [PSCustomObject]@{
             Date = $_.date
             Name = $_.name
-			Global = $_.global
-			Region = if($_.counties){ $_.counties | foreach {$_.split("-")[1]} }
+            Global = $_.global
+            CountryCode = $CountryCode
+            Counties = if ($_.counties) { ($_.counties -join ", ") } else { "" }
         }
     }
-    if ($region -ne "") {
-			return $holidays | where {$_.region -contains $region -or $_.global -eq $True} 
-	}
-	else {return $holidays | where {$_.global -eq $True}
-	}
-}
 
+    Write-Host " - dates including the global indicator: $($holidays.Count)"
+
+    # Filter holidays based on region if specified
+    if ($Region) {
+        $filteredHolidays = $holidays | Where-Object { ($_.Counties -like "*$Region*") -or ($_.Global -eq $true) }
+        Write-Host " - dates including region filtering: $($filteredHolidays.Count)"
+    } else {
+        $filteredHolidays = $holidays
+    }
+
+
+    # Merge holidays with the same date
+    $cleansedHolidays = $filteredHolidays | Group-Object -Property Date | ForEach-Object {
+        $group = $_.Group
+        $firstHoliday = $group | Select-Object -First 1
+        $allCounties = $group | Where-Object { $_.Counties -ne "" } | ForEach-Object { $_.Counties.Split(", ") } | Select-Object -Unique | Sort-Object
+
+        # Clean up the counties string by removing leading/trailing spaces and commas
+        $cleanCounties = ($allCounties -join ", ").Trim(", ").Replace("$CountryCode-", "")
+        # Sort the cleaned counties alphabetically
+        $sortedCounties = ($cleanCounties -split ", ") | Sort-Object | ForEach-Object { $_.Trim() }
+        $sortedCountiesString = [string]::Join(", ", $sortedCounties)
+
+        [PSCustomObject]@{
+            Date = $firstHoliday.Date
+            Name = $firstHoliday.Name
+            Global = $firstHoliday.Global
+            CountryCode = $firstHoliday.CountryCode
+            Counties = if ($sortedCountiesString) { $sortedCountiesString } else { "" }
+        }
+    }
+
+    # Output the final list of holidays
+    Return $cleansedHolidays
+}
 function Create-TeamsPublicHolidays {
     Param(
         [string]$CountryCode = "GB",
-	[string]$Region = "",
+        [string]$Region = "",
         [string]$ScheduleName = "UK National Holidays",
         [int]$Year = (Get-Date).Year
     )
@@ -93,35 +119,51 @@ function Create-TeamsPublicHolidays {
     # Create a new CsOnlineSchedule for the specified schedule name
     $schedule = New-CsOnlineSchedule -Name "$ScheduleName" -FixedSchedule -DateTimeRanges $initialDateTimeRange
 
+    # Ensure DateTimeRanges is initialized
+    if (-not $schedule.FixedSchedule.DateTimeRanges) {
+        $schedule.FixedSchedule.DateTimeRanges = @()
+    }
+
     # Add holidays to the schedule
     foreach ($holiday in $holidays) {
         $myDate = [datetime]::ParseExact($holiday.Date, 'yyyy-MM-dd', $null)
         $DateStart = $myDate.ToString('dd/MM/yyyy 00:00')
         $DateEnd = $myDate.AddDays(1).ToString('dd/MM/yyyy 00:00')
-		
-        # Add the holiday to the schedule
-        $schedule.FixedSchedule.DateTimeRanges += New-CsOnlineDateTimeRange -Start $DateStart -End $DateEnd
+
+        Write-Host "Processing holiday: $($holiday.Name) on $DateStart to $DateEnd"
+
+        try {
+            # Add the holiday to the schedule
+            $dateTimeRange = New-CsOnlineDateTimeRange -Start $DateStart -End $DateEnd
+            $schedule.FixedSchedule.DateTimeRanges += $dateTimeRange
+        } catch {
+            Write-Error "Failed to add holiday: $($holiday.Name) on $DateStart to $DateEnd. Error: $_"
+        }
     }
 
-	# Remove all hisatorical events
-    $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.end -ge (Get-date) }
+    # Remove all historical events
+    $schedule.FixedSchedule.DateTimeRanges = $schedule.FixedSchedule.DateTimeRanges | Where-Object { $_.End -ge (Get-Date) }
 
     # Output the dates added to the schedule
     Write-Host "Dates added to schedule '$ScheduleName':"
     $schedule.FixedSchedule.DateTimeRanges | Format-Table -Property Start, End -AutoSize
 
     # Update the schedule in Microsoft Teams
-    Set-CsOnlineSchedule -Instance $schedule | Out-Null
+    try {
+        Set-CsOnlineSchedule -Instance $schedule | Out-Null
+        Write-Host "Schedule '$ScheduleName' updated successfully."
+    } catch {
+        Write-Error "Failed to update schedule '$ScheduleName'. Error: $_"
+    }
 }
-
 
 function Update-TeamsPublicHolidays {
     Param(
         [string]$CountryCode = "GB",
-	[string]$Region = "",
+	    [string]$Region = "",
         [string]$ScheduleName = "UK National Holidays",
         [int]$Year = (Get-Date).Year,
-        [switch]$NotAppend=$false
+        [switch]$Replace=$false
     )
     
     try {
@@ -144,7 +186,7 @@ function Update-TeamsPublicHolidays {
     Write-Host "CURRENT DATES:"
     $existingSchedule.FixedSchedule.DateTimeRanges | Format-Table -Property Start, End -AutoSize
 
-    if (-not $NotAppend) {
+    if (-not $Replace) {
         foreach ($holiday in $holidays) {
             $myDate = [datetime]::ParseExact($holiday.Date, 'yyyy-MM-dd', $null)
             $DateStart = $myDate.ToString('dd/MM/yyyy 00:00')
@@ -191,4 +233,32 @@ function Update-TeamsPublicHolidays {
         # Update the schedule in Microsoft Teams
         Set-CsOnlineSchedule -Instance $schedule | Out-Null
     }
+}
+
+function Prune-TeamsPublicHolidays {
+    Param(
+        [string]$ScheduleName = "UK National Holidays"
+    )
+
+    # Retrieve existing schedule
+    $existingSchedule = Get-CsOnlineSchedule | Where-Object { $_.Name -eq "$ScheduleName" }
+    if ($existingSchedule -eq $null) {
+        Write-Error "No existing schedule found with name '$ScheduleName'"
+        return
+    }
+
+    # Output the current dates in the schedule
+    Write-Host "CURRENT DATES:"
+    $existingSchedule.FixedSchedule.DateTimeRanges | Format-Table -Property Start, End -AutoSize
+
+    # Prune past dates
+    $existingSchedule.FixedSchedule.DateTimeRanges = $existingSchedule.FixedSchedule.DateTimeRanges | Where-Object { $_.End -ge (Get-Date) }
+
+    # Output the remaining dates in the schedule
+    Write-Host "REMAINING DATES AFTER PRUNING:"
+    $existingSchedule.FixedSchedule.DateTimeRanges | Format-Table -Property Start, End -AutoSize
+
+    # Update the schedule in Microsoft Teams
+    Set-CsOnlineSchedule -Instance $existingSchedule | Out-Null
+    Write-Host "Schedule '$ScheduleName' pruned successfully."
 }

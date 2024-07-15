@@ -5,8 +5,11 @@ This PowerShell script automates the management of public holidays in Microsoft 
 ##
 
 - Author: Simon Jackson (@sjackson0109)
-- Date: 10/02/2024
-- Thanks: Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` REST api service
+- Created: 10/02/2024
+- Updated: 04/06/2024
+- Thanks go to:
+  - Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` REST api service.
+  - Contributions: Mitchell Bakker (@mitchelljb) for his work on cleaning the schedule data set and expanding the scope into regional support.
 
 
 ## Features
@@ -31,7 +34,7 @@ This PowerShell script automates the management of public holidays in Microsoft 
     - **SilentlyContinue**: Suppresses all debug messages and continues without interruption.
     - **Stop**: Halts execution when a debug message is encountered, allowing the user to investigate.
     - **Inquire**: Prompts the user to decide whether to continue or stop when a debug message is encountered.
-    - **Continue**: Displays debug messages but continues execution without interruption.
+    - **Continue**: Displays debug messages but continues execution without interruption. [Recommended for troubleshooting development]
     - **Ignore**: Ignores all debug messages and continues without interruption.
 2. **Import the PS1 Module**: Import the PowerShell script into your environment using:
     ```powershell
@@ -48,19 +51,30 @@ This PowerShell script automates the management of public holidays in Microsoft 
 
 ### Examples
 
-1. Create a *new* Schedule called `UK National Holidays`, for the year `2024`, using the following:
-- ```powershell
-  Create-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Year 2024
-  ```
-
+1. Create a *new* Schedule called `UK National Holidays`, specific to `England only`, for the year `2024`, using the following:
+   ```powershell
+   Create-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Region 'ENG'
+   ```
 2. Updating the *existing* Schedule called `DE National Holidays, use the following:
-- ```powershell
-  Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024 -Append
-  ```
+   ```powershell
+   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2026'
+   ```
 3. Replace the *existing* Schedule called `DE National Holidays, use the following:
-- ```powershell
-  Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year 2024
-  ```
+   ```powershell
+   Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2025'
+   ```
+4. Replace the *existing* Schedule called `English National Holidays`, use the following:
+   ```powershell
+   Update-TeamsPublicHolidays -ScheduleName 'English National Holidays' -CountryCode 'UK' -Region 'ENG' -Year '2025'
+   ```
+5. Updating the *existing* Schedule called `UK National Holidays`, including `England-Only` holidays, and `Replace all prior dates`. Use the following:
+   ```powershell
+   Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Region 'ENG' -Year '2025' -Replace
+   ```
+6. Prune an *existing* Schedule called `UK National Holidays`, removing all dates older than today. Use the following:
+   ```powershell
+   Prune-TeamsPublicHolidays -ScheduleName 'UK National Holidays'
+   ```
 
 |Command|Result|
 |---|---|
@@ -71,9 +85,82 @@ This PowerShell script automates the management of public holidays in Microsoft 
 ## Where do the country codes come from?
 You can look up your country code (2-digits) from [here](https://www.iban.com/country-codes).
 
+## Where do we get the region codes from?
+This is a bit of trial and error.
+Start by 'Printing out the holidays for the given year:
+```powershell
+Get-PublicHolidays | ft  
+
+Fetching holidays from URL: https://date.nager.at/api/v3/PublicHolidays/2024/GB
+ - dates retrieved: 15
+ - dates including global indicator: 15
+
+Date       Name                   Global CountryCode Counties
+----       ----                   ------ ----------- --------
+2024-01-01 New Year`s Day          False GB          ENG, NIR, SCT, WLS
+2024-01-02 2 January               False GB          SCT
+2024-03-18 Saint Patrick`s Day     False GB          NIR
+2024-03-29 Good Friday              True GB
+2024-04-01 Easter Monday           False GB          ENG, NIR, WLS
+2024-05-06 Early May Bank Holiday   True GB
+2024-05-27 Spring Bank Holiday      True GB
+2024-07-12 Battle of the Boyne     False GB          NIR
+2024-08-05 Summer Bank Holiday     False GB          SCT
+2024-08-26 Summer Bank Holiday     False GB          ENG, NIR, WLS
+2024-12-02 Saint Andrew`s Day      False GB          SCT
+2024-12-25 Christmas Day            True GB
+2024-12-26 St. Stephen`s Day        True GB
+```
+All items where Global=True should be included, for each Region underneath. Some holidays are region specific. EG UK Easter Monday covers England (ENG), Wales (WLS) and Northern-Ireland (NIR). Try adding a filter to check it works first:
+```powershell
+Get-PublicHolidays -CountryCode GB -Region ENG | ft
+Fetching holidays from URL: https://date.nager.at/api/v3/PublicHolidays/2024/GB
+ - dates retrieved: 15
+ - dates including global indicator: 15
+ - dates including region filtering: 8    <==== IS THIS WHAT YOU EXPECT?
+
+Date       Name                   Global CountryCode Counties     
+----       ----                   ------ ----------- --------
+2024-01-01 New Year`s Day          False GB          ENG, WLS
+2024-03-29 Good Friday              True GB
+2024-04-01 Easter Monday           False GB          ENG, NIR, WLS
+2024-05-06 Early May Bank Holiday   True GB
+2024-05-27 Spring Bank Holiday      True GB
+2024-08-26 Summer Bank Holiday     False GB          ENG, NIR, WLS
+2024-12-25 Christmas Day            True GB
+2024-12-26 St. Stephen`s Day        True GB
+```
+
+So if, we needed to filter Scottish Bank Holidays: it's:
+
+## Where are the Holidays for this year gone?
+If you have added national holidays, for this year (eg 2024) and you executed the code `after` your first few holiday entries have already passed. Then there is no benefit to saving those holiday dates in the schedule. Microsoft Teams API has more work to do to evaluate the dates in the past, and it will drop them. So we simply don't bloat the data-set, by removing them at source.
+
+Need to prune your own holiday schedules? Try this:
+```powershell
+Prune-TeamsPublicHolidays -ScheduleName 'TEST'
+
+CURRENT DATES:
+
+Start               End
+-----               ---
+18/06/2024 00:00:00 19/06/2024 00:00:00             <======== THIS IS AN OLD RECORD
+25/12/2024 00:00:00 26/12/2024 00:00:00
+26/12/2024 00:00:00 27/12/2024 00:00:00
+
+
+REMAINING DATES AFTER PRUNING:
+
+Start               End
+-----               ---
+25/12/2024 00:00:00 26/12/2024 00:00:00
+26/12/2024 00:00:00 27/12/2024 00:00:00
+```
+
+
 ## Support or Warranty
-These scripts are built by me, for me and customers i've supported. 
-If you want to use them, you are free to do so. But there is no warranty or support offered as part of this free code.
+These scripts are built by me, intended for me and used on customers tenants that i've had the privilege of supporting. 
+If you want to use this code, you are free to do so. But please note there is absolutely no warranty or direct support offered as part of this free code. Please don't let that deter you from logging issues you may have experienced.
 
 ## Issues and Feedback
-If you encounter any issues or have feedback to improve these scripts, please log them in the GitHub Issues or Discussions section of this repository. Your input is valuable and helps in enhancing the usability and reliability of the scripts for the community.
+If you encounter any issues or have feedback to improve these scripts, please log them in the GitHub Issues or Discussions section of this repository. Any information shared is valuable and helps in enhancing the usability and reliability of the scripts for the community.
