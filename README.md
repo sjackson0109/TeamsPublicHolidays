@@ -63,13 +63,13 @@ This PowerShell script automates the management of public holidays in Microsoft 
    ```powershell
    Update-TeamsPublicHolidays -ScheduleName 'DE National Holidays' -CountryCode 'DE' -Year '2025'
    ```
-4. Replace the *existing* Schedule called `English National Holidays`, use the following:
+4. Update the *existing* Schedule called `Polish National Holidays`, `for 2025` use the following:
    ```powershell
-   Update-TeamsPublicHolidays -ScheduleName 'English National Holidays' -CountryCode 'UK' -Region 'ENG' -Year '2025'
+   Update-TeamsPublicHolidays -ScheduleName 'Polish National Holidays' -CountryCode 'PL' -Year '2025'
    ```
-5. Updating the *existing* Schedule called `UK National Holidays`, including `England-Only` holidays, and `Replace all prior dates`. Use the following:
+5. Updating the *existing* Schedule called `English Holidays`, including `England-Only` holidays, `for 2025` and `Replace all prior dates`. Use the following:
    ```powershell
-   Update-TeamsPublicHolidays -ScheduleName 'UK National Holidays' -CountryCode 'GB' -Region 'ENG' -Year '2025' -Replace
+   Update-TeamsPublicHolidays -ScheduleName 'English Holidays' -CountryCode 'GB' -Region 'ENG' -Year '2025' -Replace
    ```
 6. Prune an *existing* Schedule called `UK National Holidays`, removing all dates older than today. Use the following:
    ```powershell
