@@ -20,7 +20,7 @@ This PowerShell script automates the management of public holidays in Microsoft 
 
 ## How to Use
 
-1. **Prerequsites**: Ensure that you have the required PowerShell modules installed, imported and logged into the correct Tenant:
+1. **Prerequisites**: Ensure that you have the required PowerShell modules installed, imported and logged into the correct Tenant:
     ```powershell
       Install-Module MicrosoftTeams
       Import-Module MicrosoftTeams
