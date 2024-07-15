@@ -8,8 +8,8 @@ This PowerShell script automates the management of public holidays in Microsoft 
 - Created: 10/02/2024
 - Updated: 04/06/2024
 - Thanks go to:
-  - Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` REST api service.
-  - Contributions: Mitchell Bakker (@mitchelljb) for his work on cleaning the schedule data set and expanding the scope into regional support.
+  - Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` rest api service.
+  - Mitchell Bakker (@mitchelljb) for his work on cleaning the schedule data set and expanding the scope into regional support.
 
 
 ## Features
