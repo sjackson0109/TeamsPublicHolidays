@@ -29,8 +29,8 @@
     Version         : 1.03
 
 .LINK
-    https://github.com/sjackson0109/TeamsScheduleNationalHolidays
-    https://blog.jacksonfamily.me/Teams-ScheduleNationalHolidays
+    https://github.com/sjackson0109/TeamsPublicHolidays
+    https://blog.jacksonfamily.me/Teams-PublicHolidays
 #>
 
 function Get-PublicHolidays {
