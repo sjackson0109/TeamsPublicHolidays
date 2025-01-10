@@ -1,12 +1,12 @@
 # Public Holidays Management for Microsoft Teams Schedule
 
-This PowerShell script automates the management of public holidays in Microsoft Teams schedules. It fetches public holiday data from an external API and updates the designated schedule in Microsoft Teams accordingly.
+This script fetches public holiday data from an external API and updates the holiday schedule in Microsoft Teams for Auto-Attendants to consume.
 
 ##
 
 - Author: Simon Jackson (@sjackson0109)
 - Created: 10/02/2024
-- Updated: 04/06/2024
+- Updated: 10/01/2025
 - Thanks go to:
   - Bjoren Dassow (@dassbj01) for a hint with `date.nager.at` rest api service.
   - Mitchell Bakker (@mitchelljb) for his work on cleaning the schedule data set and expanding the scope into regional support.
