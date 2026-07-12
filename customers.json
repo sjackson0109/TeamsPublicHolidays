@@ -1,0 +1,16 @@
+[
+  {
+    "name": "contoso",
+    "displayName": "Contoso Ltd",
+    "scheduleName": "Contoso UK Holidays",
+    "countryCode": "GB",
+    "region": "ENG"
+  },
+  {
+    "name": "fabrikam",
+    "displayName": "Fabrikam Inc",
+    "scheduleName": "Fabrikam DE Holidays",
+    "countryCode": "DE",
+    "region": "BY"
+  }
+]

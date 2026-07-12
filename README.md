@@ -159,6 +159,44 @@ Start               End
 ```
 
 
+## Multi-Customer Automation (GitHub Actions)
+
+For running this against many customer tenants unattended, `.github/workflows/sync-customer-holidays.yml` authenticates to each customer's own Entra ID tenant using an app-only certificate, and keeps every customer's credentials isolated in their own **GitHub Environment**.
+
+### How it works
+
+- `customers.json` is a routing manifest, one entry per customer. Nothing in it is secret:
+  ```json
+  {
+    "name": "contoso",
+    "displayName": "Contoso Ltd",
+    "scheduleName": "Contoso UK Holidays",
+    "countryCode": "GB",
+    "region": "ENG"
+  }
+  ```
+- The workflow reads `customers.json` and fans out a matrix job per customer.
+- Each matrix job sets `environment: <customer name>`, so GitHub only exposes that one customer's Environment secrets/variables to that job - other customers' credentials are never visible in the same run.
+- `Sync-CustomerHolidays.ps1` reads the tenant/app identity from environment variables, authenticates with `Connect-MicrosoftTeams` using an app-only certificate (no interactive login), and then calls the existing `New-TeamsPublicHolidays` / `Update-TeamsPublicHolidays` functions from `TeamsPublicHolidays.ps1`.
+
+### Onboarding a new customer
+
+1. **Register an app** in the customer's Entra ID tenant (App registrations > New registration). No redirect URI is needed - this is app-only, certificate-based auth.
+2. **Generate a certificate** (a self-signed one is fine) and upload the public key (`.cer`) to the app registration's *Certificates & secrets*. Keep the private key (`.pfx`) - you'll need it in step 5.
+3. **Grant permissions**: assign the Microsoft Teams/Graph application permissions this app needs, and have the customer's tenant admin grant admin consent. Depending on which cmdlets you rely on, you may also need the tenant admin to run `New-CsApplicationAccessPolicy` / `Grant-CsApplicationAccessPolicy` to scope the app's access to the relevant resource account(s) - check current Microsoft Teams PowerShell app-only auth documentation, as required application permissions can change.
+4. **Create a GitHub Environment** in this repository (Settings > Environments) named *exactly* the same as the `name` field you'll use in `customers.json`, e.g. `contoso`.
+5. **Add to that Environment**:
+   - Secrets: `AZURE_CERTIFICATE_BASE64` (the `.pfx` contents, base64-encoded), `AZURE_CERTIFICATE_PASSWORD` (blank if the `.pfx` has no password)
+   - Variables: `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`
+   - Optionally add required reviewers or a deployment branch policy on the Environment to control who can trigger a sync against this customer.
+6. **Add an entry** for the customer to `customers.json` (`name`, `scheduleName`, `countryCode`, `region`).
+7. **Run it**: trigger the workflow manually via `workflow_dispatch` (optionally scoped to just this customer), or let the scheduled run pick it up for every customer in `customers.json`.
+
+To base64-encode a `.pfx` for step 5:
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("customer-cert.pfx")) | Set-Clipboard
+```
+
 ## Support or Warranty
 These scripts are built by me, intended for me and used on customers tenants that i've had the privilege of supporting. 
 If you want to use this code, you are free to do so. But please note there is absolutely no warranty or direct support offered as part of this free code. Please don't let that deter you from logging issues you may have experienced.
