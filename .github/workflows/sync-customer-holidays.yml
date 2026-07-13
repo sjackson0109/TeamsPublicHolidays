@@ -1,0 +1,66 @@
+name: Sync Customer Public Holidays
+
+on:
+  workflow_dispatch:
+    inputs:
+      customer:
+        description: "Customer 'name' from customers.json to sync. Leave blank to sync every customer."
+        required: false
+        type: string
+  schedule:
+    # 03:00 UTC on 1 Dec - ahead of next year's holiday schedules
+    - cron: '0 3 1 12 *'
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set-matrix
+        shell: pwsh
+        run: |
+          $customers = Get-Content customers.json -Raw | ConvertFrom-Json
+          $filter = "${{ inputs.customer }}"
+          if ($filter) {
+            $customers = @($customers | Where-Object { $_.name -eq $filter })
+          }
+          if (-not $customers -or $customers.Count -eq 0) {
+            Write-Error "No matching customers found in customers.json for filter '$filter'"
+            exit 1
+          }
+          $json = $customers | ConvertTo-Json -Compress -AsArray
+          "matrix={`"include`":$json}" >> $env:GITHUB_OUTPUT
+
+  sync:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    # Scoping the job to an Environment named after the customer means only that
+    # customer's secrets/variables are exposed to this run - other customers'
+    # credentials are never visible here.
+    environment: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MicrosoftTeams module
+        shell: pwsh
+        run: Install-Module MicrosoftTeams -Force -Scope CurrentUser -AllowClobber
+
+      - name: Sync holidays for ${{ matrix.displayName }}
+        shell: pwsh
+        env:
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_CERTIFICATE_BASE64: ${{ secrets.AZURE_CERTIFICATE_BASE64 }}
+          AZURE_CERTIFICATE_PASSWORD: ${{ secrets.AZURE_CERTIFICATE_PASSWORD }}
+        run: |
+          ./Sync-CustomerHolidays.ps1 `
+            -CustomerName "${{ matrix.name }}" `
+            -ScheduleName "${{ matrix.scheduleName }}" `
+            -CountryCode "${{ matrix.countryCode }}" `
+            -Region "${{ matrix.region }}"
