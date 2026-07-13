@@ -59,6 +59,8 @@ try {
     Write-Host "Authenticating to customer '$CustomerName' (tenant $tenantId) using app-only certificate auth..."
     Connect-MicrosoftTeams -TenantId $tenantId -ApplicationId $clientId -CertificateThumbprint $cert.Thumbprint | Out-Null
 
+    Write-Host "Processing schedule '$ScheduleName' for customer '$CustomerName' - year $Year (country $CountryCode, region $Region)"
+
     $existingSchedule = Get-CsOnlineSchedule | Where-Object { $_.Name -eq $ScheduleName }
     if ($null -eq $existingSchedule) {
         Write-Host "Schedule '$ScheduleName' not found for '$CustomerName' - creating it."
