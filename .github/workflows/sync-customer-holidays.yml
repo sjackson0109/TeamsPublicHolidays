@@ -7,8 +7,12 @@ on:
         description: "Customer 'name' from customers.json to sync. Leave blank to sync every customer."
         required: false
         type: string
+      year:
+        description: "Calendar year to process, e.g. 2027. Leave blank to default to next calendar year."
+        required: false
+        type: string
   schedule:
-    # 03:00 UTC on 1 Dec - ahead of next year's holiday schedules
+    # 03:00 UTC on 1 Dec - prepares next year's holiday schedules ahead of the new year
     - cron: '0 3 1 12 *'
 
 jobs:
@@ -16,8 +20,35 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      year: ${{ steps.resolve-year.outputs.year }}
     steps:
       - uses: actions/checkout@v4
+
+      - id: resolve-year
+        shell: pwsh
+        run: |
+          $inputYear = "${{ inputs.year }}"
+          $isScheduled = "${{ github.event_name }}" -eq "schedule"
+
+          if ($isScheduled -or [string]::IsNullOrWhiteSpace($inputYear)) {
+            # Scheduled runs (1 Dec) and blank manual input both default to next calendar year,
+            # since a run on 1 Dec 2026 should be preparing the 2027 schedule, not updating 2026.
+            $resolvedYear = (Get-Date).Year + 1
+          } else {
+            if ($inputYear -notmatch '^\d{4}$') {
+              Write-Error "The 'year' input must be a 4-digit integer, got '$inputYear'"
+              exit 1
+            }
+            $resolvedYear = [int]$inputYear
+            if ($resolvedYear -lt 2000 -or $resolvedYear -gt 2100) {
+              Write-Error "The 'year' input must be between 2000 and 2100, got '$resolvedYear'"
+              exit 1
+            }
+          }
+
+          Write-Host "Resolved year for this run: $resolvedYear (trigger: ${{ github.event_name }})"
+          "### Public Holiday Sync`nProcessing year: **$resolvedYear** (trigger: ``${{ github.event_name }}``)" >> $env:GITHUB_STEP_SUMMARY
+          "year=$resolvedYear" >> $env:GITHUB_OUTPUT
 
       - id: set-matrix
         shell: pwsh
@@ -59,8 +90,13 @@ jobs:
           AZURE_CERTIFICATE_BASE64: ${{ secrets.AZURE_CERTIFICATE_BASE64 }}
           AZURE_CERTIFICATE_PASSWORD: ${{ secrets.AZURE_CERTIFICATE_PASSWORD }}
         run: |
+          $year = ${{ needs.discover.outputs.year }}
+          Write-Host "Processing year $year for customer '${{ matrix.name }}'"
+          "- ${{ matrix.displayName }} (``${{ matrix.name }}``): year $year" >> $env:GITHUB_STEP_SUMMARY
+
           ./Sync-CustomerHolidays.ps1 `
             -CustomerName "${{ matrix.name }}" `
             -ScheduleName "${{ matrix.scheduleName }}" `
             -CountryCode "${{ matrix.countryCode }}" `
-            -Region "${{ matrix.region }}"
+            -Region "${{ matrix.region }}" `
+            -Year $year

@@ -197,6 +197,16 @@ To base64-encode a `.pfx` for step 5:
 [Convert]::ToBase64String([IO.File]::ReadAllBytes("customer-cert.pfx")) | Set-Clipboard
 ```
 
+### Which year gets processed?
+
+The workflow runs on a schedule every **1 December**, and always prepares the *following* calendar year's holidays - a run on 1 December 2026 processes **2027**, not 2026, so the new schedule is in place well before the year it applies to.
+
+- **Scheduled run**: always uses next calendar year (current year + 1). This is not configurable.
+- **Manual run (`workflow_dispatch`) with no `year` input**: also defaults to next calendar year, matching the scheduled behaviour.
+- **Manual run with a `year` input**: processes exactly the year you specify (e.g. `year=2028` processes 2028), which is useful for backfilling a schedule or re-running a year that needs correcting.
+
+To run it manually for a specific year: go to Actions > Sync Customer Public Holidays > Run workflow, optionally set `customer` to a single customer's `name`, and set `year` to a 4-digit year between 2000 and 2100. The resolved year is validated up front (the run fails fast with a clear error if it's out of range or not 4 digits) and is echoed in the job log and the workflow run's job summary.
+
 ## Support or Warranty
 These scripts are built by me, intended for me and used on customers tenants that i've had the privilege of supporting. 
 If you want to use this code, you are free to do so. But please note there is absolutely no warranty or direct support offered as part of this free code. Please don't let that deter you from logging issues you may have experienced.
