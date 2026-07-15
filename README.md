@@ -2,7 +2,9 @@
 
 This script fetches public holiday data from an external API and updates the holiday schedule in Microsoft Teams for Auto-Attendants to consume.
 
-📖 **Full documentation, background, use cases, examples and FAQ:** see the [`/docs`](docs/index.md) folder, published via GitHub Pages once enabled (Settings > Pages > Source: Deploy from a branch > main / docs).
+📖 **Full documentation, background, use cases, examples and FAQ:** see the [`/docs`](docs/index.md) folder, published via GitHub Pages using `.github/workflows/pages.yml`.
+
+To enable it: **Settings > Actions > General > Actions permissions**, make sure Actions are allowed for this repository (a fresh/personal repo can have them disabled or unverified by default - this is the cause of the "Actions is currently unavailable" error on the Pages setup page, not a missing file). Then go to **Settings > Pages > Source: GitHub Actions** and either push to `main` or run the "Deploy GitHub Pages" workflow manually.
 
 ##
 
