@@ -1,0 +1,13 @@
+title: Teams Public Holidays
+description: >-
+  Manage Microsoft Teams Auto-Attendant / Call Queue holiday schedules from
+  public holiday data - for a single tenant, or for many customer tenants
+  unattended via GitHub Actions.
+theme: jekyll-theme-cayman
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+show_downloads: false

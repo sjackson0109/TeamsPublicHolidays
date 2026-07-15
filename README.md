@@ -2,6 +2,8 @@
 
 This script fetches public holiday data from an external API and updates the holiday schedule in Microsoft Teams for Auto-Attendants to consume.
 
+📖 **Full documentation, background, use cases, examples and FAQ:** see the [`/docs`](docs/index.md) folder, published via GitHub Pages once enabled (Settings > Pages > Source: Deploy from a branch > main / docs).
+
 ##
 
 - Author: Simon Jackson (@sjackson0109)
